@@ -65,5 +65,5 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "F:/web/作业/2023.8.24速客优鲜/SpeedPassengerFresh/pages/home/home.vue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/个人/5G智能/项目/小程序项目/quick-customer/SpeedPassengerFresh/pages/home/home.vue"]]);
 wx.createPage(MiniProgramPage);
