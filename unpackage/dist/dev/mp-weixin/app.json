@@ -16,7 +16,8 @@
   ],
   "usingComponents": {
     "van-button": "/wxcomponents/vant/dist/button/index",
-    "van-notify": "/wxcomponents/vant/dist/notify/index"
+    "van-notify": "/wxcomponents/vant/dist/notify/index",
+    "van-count-down": "/wxcomponents/vant/dist/count-down/index"
   },
   "window": {
     "navigationBarTextStyle": "black",
