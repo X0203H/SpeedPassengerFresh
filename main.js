@@ -13,7 +13,6 @@ app.$mount()
 // #endif
 
 
-
 // #ifdef VUE3
 import {
 	createSSRApp

@@ -22,6 +22,7 @@ const http = {
 			}).catch(err => { // 失败
 				// errorHandle(err)
 				// reject(err)
+				return Promise.reject(err)
 			})
 		})
 

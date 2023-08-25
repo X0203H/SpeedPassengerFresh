@@ -6684,7 +6684,7 @@ function handleLink(event) {
   }
   detail.parent = parentVm;
 }
-var parseOptions = /* @__PURE__ */ Object.freeze({
+var parseOptions$1 = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   handleLink,
   initLifetimes,
@@ -6693,8 +6693,8 @@ var parseOptions = /* @__PURE__ */ Object.freeze({
   mocks
 });
 const createApp = initCreateApp();
-const createPage = initCreatePage(parseOptions);
-const createComponent = initCreateComponent(parseOptions);
+const createPage = initCreatePage(parseOptions$1);
+const createComponent = initCreateComponent(parseOptions$1);
 const createPluginApp = initCreatePluginApp();
 const createSubpackageApp = initCreateSubpackageApp();
 {
@@ -6704,10 +6704,68 @@ const createSubpackageApp = initCreateSubpackageApp();
   wx.createPluginApp = global.createPluginApp = createPluginApp;
   wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
 }
+const WHITE = "#fff";
+const defaultOptions = {
+  selector: "#van-notify",
+  type: "danger",
+  message: "",
+  background: "",
+  duration: 3e3,
+  zIndex: 110,
+  top: 0,
+  color: WHITE,
+  safeAreaInsetTop: false,
+  onClick: () => {
+  },
+  onOpened: () => {
+  },
+  onClose: () => {
+  }
+};
+let currentOptions = Object.assign({}, defaultOptions);
+function parseOptions(message) {
+  if (message == null) {
+    return {};
+  }
+  return typeof message === "string" ? { message } : message;
+}
+function getContext() {
+  const pages = getCurrentPages();
+  return pages[pages.length - 1];
+}
+function Notify(options) {
+  options = Object.assign(Object.assign({}, currentOptions), parseOptions(options));
+  const context = options.context || getContext();
+  const notify = context.selectComponent(options.selector);
+  delete options.context;
+  delete options.selector;
+  if (notify) {
+    notify.setData(options);
+    notify.show();
+    return notify;
+  }
+  console.warn("未找到 van-notify 节点，请确认 selector 及 context 是否正确");
+}
+Notify.clear = function(options) {
+  options = Object.assign(Object.assign({}, defaultOptions), parseOptions(options));
+  const context = options.context || getContext();
+  const notify = context.selectComponent(options.selector);
+  if (notify) {
+    notify.hide();
+  }
+};
+Notify.setDefaultOptions = (options) => {
+  Object.assign(currentOptions, options);
+};
+Notify.resetDefaultOptions = () => {
+  currentOptions = Object.assign({}, defaultOptions);
+};
+exports.Notify = Notify;
 exports._export_sfc = _export_sfc;
 exports.createSSRApp = createSSRApp;
 exports.defineComponent = defineComponent;
 exports.index = index;
 exports.o = o;
 exports.p = p;
+exports.ref = ref;
 exports.resolveComponent = resolveComponent;
