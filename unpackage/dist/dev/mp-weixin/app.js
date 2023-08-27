@@ -20,7 +20,7 @@ const _sfc_main = {
     console.log("App Hide");
   }
 };
-const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/个人/5G智能/项目/小程序项目/quick-customer/速客优鲜/App.vue"]]);
+const App = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__file", "D:/uni_app/SpeedPassengerFresh/App.vue"]]);
 function createApp() {
   const app = common_vendor.createSSRApp(App);
   return {
