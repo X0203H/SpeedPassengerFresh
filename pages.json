@@ -18,7 +18,12 @@
       "path": "pages/classify/classify",
       "style": {
         "navigationBarTitleText": "分类",
-        "enablePullDownRefresh": false
+        "enablePullDownRefresh": false,
+        "usingComponents": {
+          "van-button": "/wxcomponents/vant/dist/button/index",
+          "van-tree-select": "/wxcomponents/vant/dist/tree-select/index",
+          "van-card": "/wxcomponents/vant/dist/card/index"
+        }
       }
     },
     {
@@ -58,7 +63,8 @@
     "usingComponents": {
       "van-button": "/wxcomponents/vant/dist/button/index",
       "van-notify": "/wxcomponents/vant/dist/notify/index",
-      "van-count-down": "/wxcomponents/vant/dist/count-down/index"
+      "van-count-down": "/wxcomponents/vant/dist/count-down/index",
+      "van-tree-select": "/wxcomponents/vant/dist/tree-select/index"
     }
   },
   "tabBar": {
