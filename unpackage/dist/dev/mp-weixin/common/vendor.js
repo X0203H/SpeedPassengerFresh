@@ -107,6 +107,10 @@ const looseToNumber = (val) => {
   const n = parseFloat(val);
   return isNaN(n) ? val : n;
 };
+const toNumber = (val) => {
+  const n = isString(val) ? Number(val) : NaN;
+  return isNaN(n) ? val : n;
+};
 const LINEFEED = "\n";
 const SLOT_DEFAULT_NAME = "d";
 const ON_SHOW = "onShow";
@@ -3502,43 +3506,43 @@ function injectHook(type, hook, target = currentInstance, prepend = false) {
     warn(`${apiName} is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup().`);
   }
 }
-const createHook = (lifecycle) => (hook, target = currentInstance) => (
+const createHook$1 = (lifecycle) => (hook, target = currentInstance) => (
   // post-create lifecycle registrations are noops during SSR (except for serverPrefetch)
   (!isInSSRComponentSetup || lifecycle === "sp") && injectHook(lifecycle, (...args) => hook(...args), target)
 );
-const onBeforeMount = createHook(
+const onBeforeMount = createHook$1(
   "bm"
   /* LifecycleHooks.BEFORE_MOUNT */
 );
-const onMounted = createHook(
+const onMounted = createHook$1(
   "m"
   /* LifecycleHooks.MOUNTED */
 );
-const onBeforeUpdate = createHook(
+const onBeforeUpdate = createHook$1(
   "bu"
   /* LifecycleHooks.BEFORE_UPDATE */
 );
-const onUpdated = createHook(
+const onUpdated = createHook$1(
   "u"
   /* LifecycleHooks.UPDATED */
 );
-const onBeforeUnmount = createHook(
+const onBeforeUnmount = createHook$1(
   "bum"
   /* LifecycleHooks.BEFORE_UNMOUNT */
 );
-const onUnmounted = createHook(
+const onUnmounted = createHook$1(
   "um"
   /* LifecycleHooks.UNMOUNTED */
 );
-const onServerPrefetch = createHook(
+const onServerPrefetch = createHook$1(
   "sp"
   /* LifecycleHooks.SERVER_PREFETCH */
 );
-const onRenderTriggered = createHook(
+const onRenderTriggered = createHook$1(
   "rtg"
   /* LifecycleHooks.RENDER_TRIGGERED */
 );
-const onRenderTracked = createHook(
+const onRenderTracked = createHook$1(
   "rtc"
   /* LifecycleHooks.RENDER_TRACKED */
 );
@@ -4090,7 +4094,7 @@ function resolveMergedOptions(instance) {
   } else {
     resolved = {};
     if (globalMixins.length) {
-      globalMixins.forEach((m) => mergeOptions(resolved, m, optionMergeStrategies, true));
+      globalMixins.forEach((m2) => mergeOptions(resolved, m2, optionMergeStrategies, true));
     }
     mergeOptions(resolved, base, optionMergeStrategies);
   }
@@ -4105,7 +4109,7 @@ function mergeOptions(to, from, strats, asMixin = false) {
     mergeOptions(to, extendsOptions, strats, true);
   }
   if (mixins) {
-    mixins.forEach((m) => mergeOptions(to, m, strats, true));
+    mixins.forEach((m2) => mergeOptions(to, m2, strats, true));
   }
   for (const key in from) {
     if (asMixin && key === "expose") {
@@ -5939,11 +5943,33 @@ function vFor(source, renderItem) {
   }
   return ret;
 }
+function withModelModifiers(fn, { number, trim }, isComponent = false) {
+  if (isComponent) {
+    return (...args) => {
+      if (trim) {
+        args = args.map((a) => a.trim());
+      } else if (number) {
+        args = args.map(toNumber);
+      }
+      return fn(...args);
+    };
+  }
+  return (event) => {
+    const value = event.detail.value;
+    if (trim) {
+      event.detail.value = value.trim();
+    } else if (number) {
+      event.detail.value = toNumber(value);
+    }
+    return fn(event);
+  };
+}
 const o = (value, key) => vOn(value, key);
 const f = (source, renderItem) => vFor(source, renderItem);
 const e = (target, ...sources) => extend(target, ...sources);
 const t = (val) => toDisplayString(val);
 const p = (props) => renderProps(props);
+const m = (fn, modifiers, isComponent = false) => withModelModifiers(fn, modifiers, isComponent);
 function createApp$1(rootComponent, rootProps = null) {
   rootComponent && (rootComponent.mpType = "app");
   return createVueApp(rootComponent, rootProps).use(plugin);
@@ -6743,7 +6769,7 @@ function handleLink(event) {
   }
   detail.parent = parentVm;
 }
-var parseOptions = /* @__PURE__ */ Object.freeze({
+var parseOptions$1 = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   handleLink,
   initLifetimes,
@@ -6752,8 +6778,8 @@ var parseOptions = /* @__PURE__ */ Object.freeze({
   mocks
 });
 const createApp = initCreateApp();
-const createPage = initCreatePage(parseOptions);
-const createComponent = initCreateComponent(parseOptions);
+const createPage = initCreatePage(parseOptions$1);
+const createComponent = initCreateComponent(parseOptions$1);
 const createPluginApp = initCreatePluginApp();
 const createSubpackageApp = initCreateSubpackageApp();
 {
@@ -7435,6 +7461,67 @@ Store.prototype._withCommit = function _withCommit(fn) {
   this._committing = committing;
 };
 Object.defineProperties(Store.prototype, prototypeAccessors);
+const createHook = (lifecycle) => (hook, target = getCurrentInstance()) => {
+  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
+};
+const onShow = /* @__PURE__ */ createHook(ON_SHOW);
+const WHITE = "#fff";
+const defaultOptions = {
+  selector: "#van-notify",
+  type: "danger",
+  message: "",
+  background: "",
+  duration: 3e3,
+  zIndex: 110,
+  top: 0,
+  color: WHITE,
+  safeAreaInsetTop: false,
+  onClick: () => {
+  },
+  onOpened: () => {
+  },
+  onClose: () => {
+  }
+};
+let currentOptions = Object.assign({}, defaultOptions);
+function parseOptions(message) {
+  if (message == null) {
+    return {};
+  }
+  return typeof message === "string" ? { message } : message;
+}
+function getContext() {
+  const pages = getCurrentPages();
+  return pages[pages.length - 1];
+}
+function Notify(options) {
+  options = Object.assign(Object.assign({}, currentOptions), parseOptions(options));
+  const context = options.context || getContext();
+  const notify = context.selectComponent(options.selector);
+  delete options.context;
+  delete options.selector;
+  if (notify) {
+    notify.setData(options);
+    notify.show();
+    return notify;
+  }
+  console.warn("未找到 van-notify 节点，请确认 selector 及 context 是否正确");
+}
+Notify.clear = function(options) {
+  options = Object.assign(Object.assign({}, defaultOptions), parseOptions(options));
+  const context = options.context || getContext();
+  const notify = context.selectComponent(options.selector);
+  if (notify) {
+    notify.hide();
+  }
+};
+Notify.setDefaultOptions = (options) => {
+  Object.assign(currentOptions, options);
+};
+Notify.resetDefaultOptions = () => {
+  currentOptions = Object.assign({}, defaultOptions);
+};
+exports.Notify = Notify;
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createSSRApp = createSSRApp;
@@ -7442,7 +7529,11 @@ exports.createStore = createStore;
 exports.defineComponent = defineComponent;
 exports.e = e;
 exports.f = f;
+exports.index = index;
+exports.m = m;
 exports.o = o;
+exports.onMounted = onMounted;
+exports.onShow = onShow;
 exports.p = p;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;

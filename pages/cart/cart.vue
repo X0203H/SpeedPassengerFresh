@@ -5,13 +5,13 @@
 		</view>
 		<view class="have" else>
 			<view class="item" v-for="(item,index) in list" :key="item.id">
-				<checkbox :checked="item.status" @tap="check(index)">
+				<checkbox :checked="item.status" @tap="check(index,item)">
 				</checkbox>
-				<image :src="item.pic" mode="" />
+				<image :src="item.coverImage" mode="" />
 				<div class="detailed">
 					<div class="name">{{ item.name }}</div>
-					<div class="price">￥ {{ item.price }}</div>
-					<van-stepper v-model="item.num" />
+					<div class="price">￥ {{ item.discountPrice }}</div>
+					<van-stepper @tap='nums(value)' v-model.number="item.num" />
 				</div>
 			</view>
 			<!-- 	<van-card num="2" price="2.00" desc="描述信息" title="商品标题"
@@ -29,20 +29,21 @@
 </template>
 
 <script lang="ts" setup>
-	import { ref, computed } from 'vue'
+	import {
+		onShow
+	} from "@dcloudio/uni-app";
+	import store from "../../store";
+	import { ref, computed, onMounted } from 'vue'
 	const value = ref(0)
-	const allSatus = ref(true)
-	const list = ref([{
-		status: true,
-		pic: 'https://img0.baidu.com/it/u=3072622713,1305198873&fm=253&fmt=auto&app=138&f=JPEG?w=753&h=500',
-		name: '好吃',
-		price: 12
-	}])
+	const allSatus = ref(false)
+	const list = ref([])
 	const del = () => {
 		console.log('删除')
-		list.value.filter((item) => {
-			return item.status === true
+		list.value = list.value.filter((item) => {
+			return item.status === false
 		})
+		console.log(list.value)
+		store.commit('del', list.value)
 	}
 	const buy = () => {
 		console.log('去买单')
@@ -50,28 +51,45 @@
 	}
 	const all = (e) => {
 		allSatus.value = !allSatus.value
-		console.log('全选', allSatus.value)
+		// console.log('全选', allSatus.value)
 		list.value.forEach((item) => {
 			item.status = allSatus.value
 			// console.log(item)
 		})
 	}
-	const check = (e) => {
-		console.log(e, index)
-		list.value.forEach((item) => {
-			console.log(item.status)
-		})
+	const nums = (val) => {
+		console.log(val)
 	}
-	// console.log(list.value)
-	list.value.forEach((item) => {
-		item.num = 1
-		// console.log(item)
-	})
-	
+	const check = (e, row) => {
+		// console.log(e)
+		row.status = !row.status
+		if (list.value.every(item => item.status === true)) {
+			// console.log('ok')
+			allSatus.value = true
+		}
+	}
 	const sum = computed(() => {
 		return list.value.reduce((sum, item) => {
-			return sum += item.price * item.num
+			console.log(item.discountPrice, item.status)
+			if (item.status) {
+				return sum += item.discountPrice * item.num
+			} else {
+				return sum += 0
+			}
 		}, 0)
+	})
+	onShow(() => {
+		// console.log(store.state.carList)
+		list.value = store.state.carList
+		list.value.forEach((item) => {
+			item.num = 1
+			if (item.status === undefined) {
+				// console.log('666')
+				item.status = false
+			}
+			// console.log(item)
+		})
+		// console.log(list.value)
 	})
 </script>
 

@@ -20,33 +20,9 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.0.1",
-  "appid": "touristappid",
+  "appid": "wx65a98b5eaa7c5659",
   "projectname": "速客优鲜",
-  "condition": {
-    "search": {
-      "current": -1,
-      "list": []
-    },
-    "conversation": {
-      "current": -1,
-      "list": []
-    },
-    "game": {
-      "current": -1,
-      "list": []
-    },
-    "miniprogram": {
-      "current": 1,
-      "list": [
-        {
-          "name": "",
-          "path": "",
-          "query": "",
-          "id": 0
-        }
-      ]
-    }
-  },
+  "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2

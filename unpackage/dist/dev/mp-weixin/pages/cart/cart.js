@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const store_index = require("../../store/index.js");
 if (!Array) {
   const _component_van_stepper = common_vendor.resolveComponent("van-stepper");
   _component_van_stepper();
@@ -7,19 +8,16 @@ if (!Array) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "cart",
   setup(__props) {
-    common_vendor.ref(0);
-    const allSatus = common_vendor.ref(true);
-    const list = common_vendor.ref([{
-      status: true,
-      pic: "https://img0.baidu.com/it/u=3072622713,1305198873&fm=253&fmt=auto&app=138&f=JPEG?w=753&h=500",
-      name: "好吃",
-      price: 12
-    }]);
+    const value = common_vendor.ref(0);
+    const allSatus = common_vendor.ref(false);
+    const list = common_vendor.ref([]);
     const del = () => {
       console.log("删除");
-      list.value.filter((item) => {
-        return item.status === true;
+      list.value = list.value.filter((item) => {
+        return item.status === false;
       });
+      console.log(list.value);
+      store_index.store.commit("del", list.value);
     };
     const buy = () => {
       console.log("去买单");
@@ -27,42 +25,58 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const all = (e) => {
       allSatus.value = !allSatus.value;
-      console.log("全选", allSatus.value);
       list.value.forEach((item) => {
         item.status = allSatus.value;
       });
     };
-    const check = (e) => {
-      console.log(e, index);
-      list.value.forEach((item) => {
-        console.log(item.status);
-      });
+    const nums = (val) => {
+      console.log(val);
     };
-    list.value.forEach((item) => {
-      item.num = 1;
-    });
+    const check = (e, row) => {
+      row.status = !row.status;
+      if (list.value.every((item) => item.status === true)) {
+        allSatus.value = true;
+      }
+    };
     const sum = common_vendor.computed(() => {
       return list.value.reduce((sum2, item) => {
-        return sum2 += item.price * item.num;
+        console.log(item.discountPrice, item.status);
+        if (item.status) {
+          return sum2 += item.discountPrice * item.num;
+        } else {
+          return sum2 += 0;
+        }
       }, 0);
+    });
+    common_vendor.onShow(() => {
+      list.value = store_index.store.state.carList;
+      list.value.forEach((item) => {
+        item.num = 1;
+        if (item.status === void 0) {
+          item.status = false;
+        }
+      });
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: list.value.length === 0
       }, list.value.length === 0 ? {} : {}, {
-        b: common_vendor.f(list.value, (item, index2, i0) => {
+        b: common_vendor.f(list.value, (item, index, i0) => {
           return {
             a: item.status,
-            b: common_vendor.o(($event) => check(index2), item.id),
-            c: item.pic,
+            b: common_vendor.o(($event) => check(index, item), item.id),
+            c: item.coverImage,
             d: common_vendor.t(item.name),
-            e: common_vendor.t(item.price),
-            f: "3cd1a988-0-" + i0,
-            g: common_vendor.o(($event) => item.num = $event, item.id),
-            h: common_vendor.p({
+            e: common_vendor.t(item.discountPrice),
+            f: common_vendor.o(($event) => nums(value.value), item.id),
+            g: "3cd1a988-0-" + i0,
+            h: common_vendor.o(common_vendor.m(($event) => item.num = $event, {
+              number: true
+            }, true), item.id),
+            i: common_vendor.p({
               modelValue: item.num
             }),
-            i: item.id
+            j: item.id
           };
         }),
         c: common_vendor.o(all),

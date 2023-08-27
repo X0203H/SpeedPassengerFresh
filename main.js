@@ -12,8 +12,6 @@ const app = new Vue({
 app.$mount()
 // #endif
 
-
-
 // #ifdef VUE3
 import {
 	createSSRApp
